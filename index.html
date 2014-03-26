@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>HEPs Nachrichten</title>
+  </head>
+  <body>
+    <h2><a style="text-decoration:none;color:#000" href="./">HEPs Nachrichten</a></h2>
+    <label for="feed-list"><strong>W&auml;hle einen Nachrichten-Feed: </strong></label>
+    <select id="feed-list">
+      <option value="">Bitte ausw&auml;hlen...</option>
+      <option value="http://www.spiegel.de/schlagzeilen/tops/index.rss">SPIEGEL ONLINE - Topmeldungen</option>
+      <option value="http://www.spiegel.de/politik/index.rss">SPIEGEL ONLINE - Politik</option>
+      <option value="http://www.spiegel.de/wirtschaft/index.rss">SPIEGEL ONLINE - Wirtschaft</option>
+      <option value="http://www.spiegel.de/panorama/index.rss">SPIEGEL ONLINE - Panorama</option>
+      <option value="http://www.spiegel.de/sport/index.rss">SPIEGEL ONLINE - Sport</option>
+      <option value="http://www.spiegel.de/kultur/index.rss">SPIEGEL ONLINE - Kultur</option>
+      <option value="http://www.spiegel.de/netzwelt/index.rss">SPIEGEL ONLINE - Netzwelt</option>
+      <option value="http://www.spiegel.de/wissenschaft/index.rss">SPIEGEL ONLINE - Wissenschaft</option>
+      <option value="http://www.heise.de/newsticker/heise-top-atom.xml">heise online - Top News</option>
+      <option value="http://www.heise.de/autos/rss/news-atom.xml">heise online - Autos</option>
+      <option value="http://www.heise.de/developer/rss/news-atom.xml">heise online - Developer</option>
+      <option value="http://www.heise.de/open/news/news-atom.xml">heise online - Open</option>
+      <option value="http://www.heise.de/security/news/news-atom.xml">heise online - Security</option>
+      <option value="http://rss.golem.de/rss.php?feed=ATOM1.0">Golem.de - Alle Nachrichten</option>
+    </select>
+    &nbsp;&nbsp;<img id="img-loading" src="./loading.gif" alt="Lade..." style="display:none"></img>
+    <p style="text-align:right">Fragen? <a href="/faq.html">Antworten!</a></p>
+    <p></p>
+    <h3 id="articles-header"></h3>
+    <ul id="article-list">
+    </ul>
+    <p></p>
+    <div style="text-align:center"></div>
+    <div style="text-align:right">Humbly made with <a href="http://fivefilters.org/">fivefilters</a> (PHP), JavaScript and HTML<br>by HEP</div>
+    <script src="jquery.js"></script>
+<script>
+function getRequestUrl(rssUrl) {
+  return './fivefilters/makefulltextfeed.php?url=' + encodeURIComponent(rssUrl) + '&max=10&links=preserve&exc=&format=json';
+}
+
+$('#feed-list').change(function() {
+  var feedUrl = $('#feed-list option:selected').val();
+  if(feedUrl === "") return;
+  $('#img-loading').css('display', 'inline');
+  $.getJSON(getRequestUrl(feedUrl), function(data) {
+    $('#img-loading').css('display', 'none');
+    var feed = data.rss.channel;
+    $('#articles-header').html('<a style="text-decoration:none;color:#000" href="' + feed.link + '">' + feed.title + ' - ' + feed.description + '</a>');
+    $('#article-list').empty();
+    for(var i = 0; i < feed.item.length; ++i)
+    {
+      var posStart = feed.item[i].description.indexOf('<p>') + 3;
+      var posEnd   = feed.item[i].description.lastIndexOf('</p>') + 4;
+      var article = feed.item[i].description.substring(posStart, posEnd); 
+      $('#article-list').append('<li><p><a href="' + feed.item[i].link + '">[l]</a> ' + article + '</li>');
+    }
+  }); 
+});
+</script>
+  </body>
+</html>
+
