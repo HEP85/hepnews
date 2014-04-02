@@ -52,7 +52,8 @@ $('#feed-list').change(function() {
     {
       var posStart = feed.item[i].description.indexOf('<p>') + 3;
       var posEnd   = feed.item[i].description.lastIndexOf('</p>') + 4;
-      var article = feed.item[i].description.substring(posStart, posEnd); 
+      var article = feed.item[i].description.substring(posStart, posEnd);
+      article = article.replace(/<img\s[^>]*(\/>|[^>]*<\/img>)/gi, '&nbsp;'); // replace pictures with blank
       $('#article-list').append('<li><p><a href="' + feed.item[i].link + '">[l]</a> ' + article + '</li>');
     }
   }); 
