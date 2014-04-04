@@ -24,6 +24,10 @@
       <option value="http://www.heise.de/security/news/news-atom.xml">heise online - Security</option>
       <option value="http://rss.golem.de/rss.php?feed=ATOM1.0">Golem.de - Alle Nachrichten</option>
     </select>
+    <span id="feed-actions" style="display:none">
+      &nbsp;<img id="img-feed-add" src="feed_add.png" alt="Add feed" title="Add feed" style="cursor:pointer" />
+      &nbsp;<img id="img-feed-delete" src="feed_delete.png" alt="Delete feed" title="Delete feed" style="cursor:pointer" />
+    </span>
     &nbsp;&nbsp;<img id="img-loading" src="./loading.gif" alt="Lade..." style="display:none"></img>
     <p style="text-align:right">Fragen? <a href="/faq.html">Antworten!</a></p>
     <p></p>
@@ -35,9 +39,52 @@
     <div style="text-align:right">Humbly made with <a href="http://fivefilters.org/">fivefilters</a> (PHP), JavaScript and HTML<br>by HEP</div>
     <script src="jquery.js"></script>
 <script>
+var hardcodedFeeds;
+
 function getRequestUrl(rssUrl) {
   return './fivefilters/makefulltextfeed.php?url=' + encodeURIComponent(rssUrl) + '&max=10&links=preserve&exc=&format=json';
 }
+
+function loadCustomFeeds()
+{
+  for(var i = 0; i < localStorage.length; ++i)
+    if(localStorage.key(i).indexOf('feed.') == 0)
+    {
+      var key = localStorage.key(i);
+      $('<option/>').attr('value', localStorage.getItem(key)).text(key.substr(5)).appendTo('#feed-list');
+    }
+}
+
+function addCustomFeed()
+{
+  var feedUrl = prompt("Please enter feed URL:", "http://");
+  if(feedUrl == null) return;
+  var feedName = prompt("Please enter feed name:");
+  if(feedName == null) return;
+  localStorage.setItem('feed.' + feedName, feedUrl);
+  $('<option/>').attr('value', feedUrl).text(feedName).appendTo('#feed-list');
+}
+
+function deleteCustomFeed()
+{
+  var option = $('#feed-list option:selected');
+  if(option.index() >= 15)
+  {
+    localStorage.removeItem('feed.' + option.text());
+    option.remove();
+  }
+}
+
+$(document).ready(function() {
+  hardcodedFeeds = $('#feed-list option').length;
+  if(typeof(Storage) !== 'undefined')
+  {
+    $('#feed-actions').css('display', 'inline');
+    loadCustomFeeds();
+    $('#img-feed-add').click(addCustomFeed);
+    $('#img-feed-delete').click(deleteCustomFeed);
+  }
+});
 
 $('#feed-list').change(function() {
   var feedUrl = $('#feed-list option:selected').val();
@@ -56,6 +103,9 @@ $('#feed-list').change(function() {
       article = article.replace(/<img\s[^>]*(\/>|[^>]*<\/img>)/gi, '&nbsp;'); // replace pictures with blank
       $('#article-list').append('<li><p><a href="' + feed.item[i].link + '">[l]</a> ' + article + '</li>');
     }
+  }).fail(function() {
+    $('#img-loading').css('display', 'none');
+    alert("Error retrieving feed URL."); 
   }); 
 });
 </script>

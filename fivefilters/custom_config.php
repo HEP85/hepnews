@@ -135,7 +135,8 @@ $options->admin_credentials = array('username'=>'admin', 'password'=>'');
 // will be permitted.
 // Empty: array();
 // Non-empty example: array('example.com', 'anothersite.org');
-$options->allowed_urls = array('spiegel.de', 'heise.de', 'golem.de');
+$options->allowed_urls = array();
+//$options->allowed_urls = array('spiegel.de', 'heise.de', 'golem.de');
 
 // URLs to block
 // ----------------------
